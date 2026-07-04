@@ -1,11 +1,12 @@
 'use client';
 
 import { useParams, notFound } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
 import { Icon } from '@iconify/react';
 
 export default function ProductDetailPage() {
@@ -14,12 +15,25 @@ export default function ProductDetailPage() {
   const product = products.find((p) => p.id === id);
 
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const addItem = useCartStore((state) => state.addItem);
   const toggleCart = useCartStore((state) => state.toggleCart);
+
+  const toggleWishlistStoreItem = useWishlistStore((state) => state.toggleItem);
+  const wishlistItems = useWishlistStore((state) => state.items);
+  const isWishlisted = (productId: string) => wishlistItems.some((item) => item.id === productId);
+
+  // Reset selected image when navigating to another product
+  useEffect(() => {
+    setSelectedImage(null);
+  }, [id]);
 
   if (!product) {
     return notFound();
   }
+
+  const activeImage = selectedImage || product.image;
 
   const handleAddToCart = () => {
     addItem({
@@ -32,10 +46,13 @@ export default function ProductDetailPage() {
     toggleCart();
   };
 
-  // Get related products (same category or others, excluding current)
-  const relatedProducts = products
-    .filter((p) => p.id !== product.id)
-    .slice(0, 3);
+  // Get related products (same category, randomized, excluding current product)
+  const relatedProducts = useMemo(() => {
+    return products
+      .filter((p) => p.id !== product.id && p.category === product.category)
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 4);
+  }, [product.id, product.category]);
 
   return (
     <div className="w-full bg-white min-h-screen">
@@ -44,15 +61,40 @@ export default function ProductDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
           
           {/* Left Column: Image Gallery/Container */}
-          <div className="relative w-full aspect-square md:aspect-[1.1] bg-gray-50 rounded-[30px] border border-black flex items-center justify-center p-8 overflow-hidden group">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              priority
-              className="object-contain p-8 transition-transform duration-500 group-hover:scale-105"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
+          <div className="flex flex-col w-full">
+            <div className="relative w-full aspect-square md:aspect-[1.1] bg-gray-50 rounded-[30px] border border-black flex items-center justify-center p-8 overflow-hidden group">
+              <Image
+                src={activeImage}
+                alt={product.name}
+                fill
+                priority
+                className="object-contain p-8 transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+              />
+            </div>
+
+            {/* Thumbnail Row */}
+            {product.images && product.images.length > 1 && (
+              <div className="flex flex-wrap gap-3 mt-6">
+                {product.images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedImage(img)}
+                    className={`relative w-20 h-20 bg-gray-50 rounded-2xl border-2 overflow-hidden flex items-center justify-center p-2 cursor-pointer transition-all ${
+                      activeImage === img ? 'border-black' : 'border-gray-200'
+                    }`}
+                  >
+                    <Image
+                      src={img}
+                      alt={`${product.name} detail ${idx + 1}`}
+                      fill
+                      className="object-contain p-2"
+                      sizes="80px"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Content details */}
@@ -132,6 +174,17 @@ export default function ProductDetailPage() {
               >
                 Add To Cart
               </button>
+
+              <button
+                onClick={() => toggleWishlistStoreItem(product)}
+                className="w-full sm:w-14 h-14 border border-black rounded-full flex items-center justify-center cursor-pointer transition-all active:scale-95 duration-200 flex-shrink-0"
+                aria-label={isWishlisted(product.id) ? "Remove from wishlist" : "Add to wishlist"}
+              >
+                <Icon 
+                  icon={isWishlisted(product.id) ? "solar:heart-bold" : "solar:heart-linear"} 
+                  className={`w-6 h-6 transition-transform duration-300 ${isWishlisted(product.id) ? "text-red-500 animate-heart-pop scale-110" : "text-black"}`} 
+                />
+              </button>
             </div>
 
           </div>
@@ -145,12 +198,12 @@ export default function ProductDetailPage() {
             Related Skateboards
           </h2>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border border-black divide-y sm:divide-y-0 lg:divide-x divide-black bg-white">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 border-t border-l border-black bg-white">
             {relatedProducts.map((p) => (
               <Link 
                 key={p.id} 
                 href={`/products/${p.id}`}
-                className="flex flex-col bg-white group"
+                className="flex flex-col bg-white group border-b border-r border-black"
               >
                 <div className="relative w-full aspect-[4/5] p-6 flex items-center justify-center overflow-hidden border-b border-black">
                   <Image

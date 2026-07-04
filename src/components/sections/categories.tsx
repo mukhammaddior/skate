@@ -3,10 +3,10 @@ import Link from 'next/link';
 
 export default function Categories() {
   const cats = [
-    { title: "SKATE WHEELS", img: "/images/categories/cat-wheels.png", link: "/men" },
-    { title: "SKATE SHOES", img: "/images/categories/cat-shoes.png", link: "/women" },
-    { title: "SKATE CLOTHINGS", img: "/images/categories/cat-clothings.png", link: "/children" },
-    { title: "SKATE HATS", img: "/images/categories/cat-hats.png", link: "/children" },
+    { title: "SKATE WHEELS", img: "/images/categories/cat-wheels.png", link: "/wheels" },
+    { title: "SKATE SHOES", img: "/images/categories/cat-shoes.png", link: "/shoes" },
+    { title: "SKATE CLOTHINGS", img: "/images/categories/cat-clothings.png", link: "/clothing" },
+    { title: "SKATE HATS", img: "/images/categories/cat-hats.png", link: "/hats" },
   ];
 
   return (

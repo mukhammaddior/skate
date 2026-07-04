@@ -7,12 +7,31 @@ import { Icon } from '@iconify/react';
 
 export default function Footer() {
   const [email, setEmail] = useState('');
+  const [isPending, setIsPending] = useState(false);
 
-  const handleNewsletterSubmit = (e: React.FormEvent) => {
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email) return;
-    alert(`Thank you for subscribing with ${email}!`);
-    setEmail('');
+
+    setIsPending(true);
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert(data.message);
+        setEmail('');
+      } else {
+        alert(data.error || 'Subscription failed');
+      }
+    } catch (error) {
+      alert('Subscription error. Please try again.');
+    } finally {
+      setIsPending(false);
+    }
   };
 
   const handleScroll = (targetId: string, alertMsg?: string) => {
@@ -33,20 +52,20 @@ export default function Footer() {
   };
 
   const quickLinks = [
-    { name: 'Home', target: 'home' },
-    { name: 'About Us', target: 'about' },
-    { name: 'Shop', target: 'products' },
-    { name: 'Offers', target: '', alert: 'Special offers are coming soon!' },
-    { name: 'Articles', target: 'blogs' },
-    { name: 'Contact Us', target: 'contact' },
+    { name: 'Home', href: '/' },
+    { name: 'About Us', href: '/about' },
+    { name: 'Shop', href: '/men' },
+    { name: 'Offers', href: '/offers' },
+    { name: 'Articles', href: '/articles' },
+    { name: 'Contact Us', href: '/contact' },
   ];
 
   const aboutLinks = [
-    { name: 'History', target: 'about' },
-    { name: 'Videos', target: 'latest-video' },
-    { name: 'Established', target: '', alert: 'Established in 2024. Providing custom boards globally!' },
-    { name: 'Tutorials', target: 'blogs' },
-    { name: 'How To Skate', target: 'blogs' },
+    { name: 'History', href: '/history' },
+    { name: 'Videos', href: '/videos' },
+    { name: 'Established', href: '/about' },
+    { name: 'Tutorials', href: '/tutorials' },
+    { name: 'How To Skate', href: '/how-to-skate' },
   ];
 
   return (
@@ -58,7 +77,7 @@ export default function Footer() {
           
           {/* Logo va Social qismi */}
           <div className="flex flex-col gap-6">
-            <Link href="/" className="relative w-32 h-10" onClick={(e) => { e.preventDefault(); handleScroll('home'); }}>
+            <Link href="/" className="relative w-32 h-10">
               <Image 
                 src="/images/footer-logo.png" 
                 alt="Skate Logo"
@@ -90,13 +109,13 @@ export default function Footer() {
             <h4 className="font-oswald font-black text-xl uppercase tracking-wider">Quick Links</h4>
             <nav className="flex flex-col gap-3">
               {quickLinks.map((link) => (
-                <button 
+                <Link 
                   key={link.name} 
-                  onClick={() => handleScroll(link.target, link.alert)}
+                  href={link.href}
                   className="text-left text-sm text-[#666666] hover:text-black transition-colors cursor-pointer"
                 >
                   {link.name}
-                </button>
+                </Link>
               ))}
             </nav>
           </div>
@@ -106,13 +125,13 @@ export default function Footer() {
             <h4 className="font-oswald font-black text-xl uppercase tracking-wider">About</h4>
             <nav className="flex flex-col gap-3">
               {aboutLinks.map((link) => (
-                <button 
+                <Link 
                   key={link.name} 
-                  onClick={() => handleScroll(link.target, link.alert)}
+                  href={link.href}
                   className="text-left text-sm text-[#666666] hover:text-black transition-colors cursor-pointer"
                 >
                   {link.name}
-                </button>
+                </Link>
               ))}
             </nav>
           </div>
@@ -127,13 +146,18 @@ export default function Footer() {
               <input 
                 type="email" 
                 required
+                disabled={isPending}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email-address" 
-                className="flex-grow border border-gray-200 border-r-0 px-4 py-3 text-sm focus:outline-none focus:border-black text-black"
+                className="flex-grow border border-gray-200 border-r-0 px-4 py-3 text-sm focus:outline-none focus:border-black text-black disabled:opacity-50"
               />
-              <button type="submit" className="bg-[#F4D0A4] cursor-pointer text-black font-oswald font-bold px-6 py-3 text-xs uppercase tracking-widest hover:bg-[#e3be92] transition-colors">
-                Send
+              <button 
+                type="submit" 
+                disabled={isPending}
+                className="bg-[#F4D0A4] cursor-pointer text-black font-oswald font-bold px-6 py-3 text-xs uppercase tracking-widest hover:bg-[#e3be92] transition-colors disabled:opacity-50"
+              >
+                {isPending ? 'Sending' : 'Send'}
               </button>
             </div>
           </form>

@@ -12,11 +12,34 @@ export default function ContactPage() {
     message: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isPending, setIsPending] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
-    alert(`Thank you, ${formData.name}! Your message has been sent successfully.`);
-    setFormData({ name: '', email: '', subject: '', message: '' });
+
+    setIsPending(true);
+    setSuccessMessage(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSuccessMessage(data.message);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+      } else {
+        alert(data.error || 'Failed to submit message');
+      }
+    } catch (error) {
+      alert('Error submitting message. Please try again.');
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -85,6 +108,13 @@ export default function ContactPage() {
         <div className="p-8 sm:p-16 lg:p-24 bg-gray-50">
           <h2 className="font-oswald text-4xl font-bold uppercase mb-8">Send Us A Message</h2>
 
+          {successMessage && (
+            <div className="bg-green-50 border border-green-200 text-green-800 p-4 rounded-xl font-sora text-sm mb-6 flex items-center gap-2">
+              <Icon icon="solar:check-circle-bold" className="w-5 h-5 text-green-500" />
+              <span>{successMessage}</span>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               <div className="flex flex-col gap-2">
@@ -92,10 +122,11 @@ export default function ContactPage() {
                 <input 
                   type="text" 
                   required
+                  disabled={isPending}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   placeholder="John Doe"
-                  className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white"
+                  className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white disabled:opacity-50"
                 />
               </div>
               <div className="flex flex-col gap-2">
@@ -103,22 +134,24 @@ export default function ContactPage() {
                 <input 
                   type="email" 
                   required
+                  disabled={isPending}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder="john@example.com"
-                  className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white"
+                  className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white disabled:opacity-50"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col gap-2">
+             <div className="flex flex-col gap-2">
               <label className="font-sora text-xs font-bold uppercase tracking-wider text-gray-600">Subject</label>
               <input 
                 type="text" 
+                disabled={isPending}
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="How can we help?"
-                className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white"
+                className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white disabled:opacity-50"
               />
             </div>
 
@@ -127,18 +160,20 @@ export default function ContactPage() {
               <textarea 
                 required
                 rows={5}
+                disabled={isPending}
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="Write your thoughts here..."
-                className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white resize-none"
+                className="w-full border border-black p-4 text-sm font-sora focus:outline-none focus:bg-[#FFD9A0]/10 text-black bg-white resize-none disabled:opacity-50"
               />
             </div>
 
             <Button 
               type="submit" 
-              className="bg-black text-white hover:bg-neutral-800 rounded-full px-12 py-7 font-sora font-bold text-xs uppercase tracking-widest transition-all duration-300 w-full sm:w-auto"
+              disabled={isPending}
+              className="bg-black text-white hover:bg-neutral-800 rounded-full px-12 py-7 font-sora font-bold text-xs uppercase tracking-widest transition-all duration-300 w-full sm:w-auto disabled:opacity-50 cursor-pointer"
             >
-              Submit Message
+              {isPending ? 'Sending...' : 'Submit Message'}
             </Button>
           </form>
         </div>

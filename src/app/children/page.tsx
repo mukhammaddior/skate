@@ -4,11 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { products } from '@/data/products';
 import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import { Icon } from '@iconify/react';
 
 export default function ChildrenCategoryPage() {
   const childrenProducts = products.filter((p) => p.category === 'children');
   const addItem = useCartStore((state) => state.addItem);
   const toggleCart = useCartStore((state) => state.toggleCart);
+
+  const toggleWishlistStoreItem = useWishlistStore((state) => state.toggleItem);
+  const wishlistItems = useWishlistStore((state) => state.items);
+  const isWishlisted = (productId: string) => wishlistItems.some((item) => item.id === productId);
 
   const handleAddToCart = (e: React.MouseEvent, product: typeof products[0]) => {
     e.preventDefault();
@@ -36,12 +42,12 @@ export default function ChildrenCategoryPage() {
       </div>
 
       <div className="max-w-[1400px] mx-auto py-16 px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border border-black divide-y sm:divide-y-0 lg:divide-x divide-black bg-white">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 border-t border-l border-black bg-white">
           {childrenProducts.map((product) => (
             <Link 
               key={product.id} 
               href={`/products/${product.id}`}
-              className="flex flex-col bg-white group"
+              className="flex flex-col bg-white group border-b border-r border-black animate-fade-in"
             >
               {/* Product Image */}
               <div className="relative w-full aspect-[4/5] p-6 flex items-center justify-center overflow-hidden border-b border-black">
@@ -62,6 +68,22 @@ export default function ChildrenCategoryPage() {
                     Add to Cart
                   </button>
                 </div>
+
+                {/* Wishlist Button */}
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    toggleWishlistStoreItem(product);
+                  }}
+                  className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-black border border-neutral-200 flex items-center justify-center shadow-sm cursor-pointer transition-all active:scale-95 duration-200"
+                  aria-label="Add to wishlist"
+                >
+                  <Icon 
+                    icon={isWishlisted(product.id) ? 'solar:heart-bold' : 'solar:heart-linear'} 
+                    className={`w-5 h-5 transition-transform duration-300 ${isWishlisted(product.id) ? 'text-red-500 animate-heart-pop scale-110' : 'text-black'}`} 
+                  />
+                </button>
               </div>
 
               {/* Product Info */}

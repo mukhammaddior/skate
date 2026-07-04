@@ -8,13 +8,29 @@ import Image from 'next/image';
 import { navLinks } from '@/data/navigation';
 import { useScrollLock } from '@/hooks/useScrollLock';
 import { useCartStore } from '@/store/useCartStore';
+import { useWishlistStore } from '@/store/useWishlistStore';
+import { useSearchStore } from '@/store/useSearchStore';
+import { useUserStore } from '@/store/useUserStore';
+
 import CartDrawer from '@/components/layout/CartDrawer';
+import WishlistDrawer from '@/components/layout/WishlistDrawer';
+import SearchDrawer from '@/components/layout/SearchDrawer';
+import AccountDrawer from '@/components/layout/AccountDrawer';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   const cartItems = useCartStore((state) => state.items);
   const totalCartItems = cartItems.reduce((acc, item) => acc + item.quantity, 0);
   const toggleCart = useCartStore((state) => state.toggleCart);
+
+  const wishlistItems = useWishlistStore((state) => state.items);
+  const toggleWishlist = useWishlistStore((state) => state.toggleWishlist);
+
+  const toggleSearch = useSearchStore((state) => state.toggleSearch);
+
+  const toggleAccount = useUserStore((state) => state.toggleAccount);
+  const user = useUserStore((state) => state.user);
   
   const pathname = usePathname();
   const isHome = pathname === '/';
@@ -54,16 +70,21 @@ export default function Header() {
           <button 
             aria-label="Search" 
             className="hidden sm:block hover:text-white/70 cursor-pointer transition-colors duration-200"
-            onClick={() => alert("Search functionality is coming soon!")}
+            onClick={toggleSearch}
           >
             <Icon icon="solar:magnifer-linear" className="w-5 h-5 md:w-[22px] md:h-[22px]" />
           </button>
           <button 
             aria-label="Wishlist" 
-            className="hidden sm:block hover:text-white/70 cursor-pointer transition-colors duration-200"
-            onClick={() => alert("Wishlist feature is coming soon!")}
+            className="hidden sm:block hover:text-white/70 cursor-pointer transition-colors duration-200 relative"
+            onClick={toggleWishlist}
           >
             <Icon icon="solar:heart-linear" className="w-5 h-5 md:w-[22px] md:h-[22px]" />
+            {wishlistItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#FFD9A0] text-black text-[9px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center">
+                {wishlistItems.length}
+              </span>
+            )}
           </button>
           <button 
             aria-label="Cart" 
@@ -79,10 +100,13 @@ export default function Header() {
           </button>
           <button 
             aria-label="User Profile" 
-            className="hidden sm:block hover:text-white/70 cursor-pointer transition-colors duration-200"
-            onClick={() => alert("User accounts will be available soon!")}
+            className="hidden sm:block hover:text-white/70 cursor-pointer transition-colors duration-200 relative"
+            onClick={toggleAccount}
           >
             <Icon icon="solar:user-linear" className="w-5 h-5 md:w-[22px] md:h-[22px]" />
+            {user && (
+              <span className="absolute -top-1 -right-1 bg-green-500 w-2.5 h-2.5 rounded-full border border-black" title={`Logged in as ${user.name}`} />
+            )}
           </button>
           
           {/* Mobile Hamburger Button */}
@@ -126,20 +150,25 @@ export default function Header() {
             className="hover:text-gray-400"
             onClick={() => {
               setIsMenuOpen(false);
-              alert("Search functionality is coming soon!");
+              toggleSearch();
             }}
           >
             <Icon icon="solar:magnifer-linear" className="w-7 h-7" />
           </button>
           <button 
             aria-label="Wishlist" 
-            className="hover:text-gray-400"
+            className="hover:text-gray-400 relative"
             onClick={() => {
               setIsMenuOpen(false);
-              alert("Wishlist feature is coming soon!");
+              toggleWishlist();
             }}
           >
             <Icon icon="solar:heart-linear" className="w-7 h-7" />
+            {wishlistItems.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-[#FFD9A0] text-black text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {wishlistItems.length}
+              </span>
+            )}
           </button>
           <button 
             aria-label="Cart" 
@@ -158,19 +187,25 @@ export default function Header() {
           </button>
           <button 
             aria-label="User Profile" 
-            className="hover:text-gray-400"
+            className="hover:text-gray-400 relative"
             onClick={() => {
               setIsMenuOpen(false);
-              alert("User accounts will be available soon!");
+              toggleAccount();
             }}
           >
             <Icon icon="solar:user-linear" className="w-7 h-7" />
+            {user && (
+              <span className="absolute -top-1 -right-1 bg-green-500 w-3 h-3 rounded-full border border-black" />
+            )}
           </button>
         </div>
       </div>
 
-      {/* Cart Drawer */}
+      {/* Drawers */}
       <CartDrawer />
+      <WishlistDrawer />
+      <SearchDrawer />
+      <AccountDrawer />
     </>
   );
 }

@@ -40,9 +40,9 @@ export default function RootLayout({
       lang="en"
       className={`${oswald.variable} ${sora.variable} ${roboto.variable} ${inter.className} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <Header />
-        <main className="min-h-screen relative">
+        <main className="flex-grow relative">
           {children}
         </main>
         <Footer />

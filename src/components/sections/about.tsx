@@ -31,7 +31,7 @@ export default function About() {
 
         {/* O'ng tomon: Matn va Tugma qismi */}
         <div className="flex flex-col items-start justify-center p-8 sm:p-12 md:p-16 lg:p-24 gap-6">
-          <h2 className="text-[40px] sm:text-[50px] lg:text-[55px] xl:text-[60px] font-bold font-oswald uppercase tracking-[-0.03em] leading-[1.05] text-[#141414]">
+          <h2 className="text-3xl sm:text-5xl lg:text-[55px] xl:text-[60px] font-bold font-oswald uppercase tracking-[-0.03em] leading-[1.05] text-[#141414]">
             Our Journey From <br /> Street To Store
           </h2>
 

@@ -1,8 +1,17 @@
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { blogs } from '@/data/blogs';
 
 export default function Blogs() {
+  const scrollToProducts = () => {
+    const element = document.getElementById('products');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <section className="w-full bg-white py-20">
       <div className="max-w-full flex flex-col mx-1">
@@ -15,6 +24,7 @@ export default function Blogs() {
           <Button 
             variant="default" 
             className="bg-[#1A1A1A] text-white hover:bg-black rounded-full px-8 py-6 text-xs font-bold tracking-[0.15em] uppercase transition-colors"
+            onClick={scrollToProducts}
           >
             Shop All Products
           </Button>

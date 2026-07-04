@@ -1,9 +1,18 @@
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 export default function About() {
+  const scrollToVideo = () => {
+    const element = document.getElementById('latest-video');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="w-full bg-white border-b border-black">
+    <section id="about" className="w-full bg-white border-b border-black">
       <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-black">
         
         {/* Chap tomon: Rasm qismi */}
@@ -41,6 +50,7 @@ export default function About() {
           <Button
             variant="default"
             className="mt-4 bg-[#141414] text-white hover:bg-black rounded-full px-10 py-6 text-xs font-bold tracking-[0.2em] uppercase transition-colors border-none"
+            onClick={scrollToVideo}
           >
             About Our Store
           </Button>

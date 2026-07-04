@@ -20,7 +20,7 @@ export default function LatestVideo() {
     };
 
     return (
-        <section className="relative w-full bg-white py-20 overflow-hidden">
+        <section id="latest-video" className="relative w-full bg-white py-20 overflow-hidden">
 
             {/* Fon — kulrang diagonal shape */}
             <div

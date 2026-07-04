@@ -1,9 +1,18 @@
+'use client';
+
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 
 export default function Hero() {
+  const scrollToProducts = () => {
+    const element = document.getElementById('products');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section className="relative h-screen w-full flex items-center justify-center overflow-hidden">
+    <section id="home" className="relative h-screen w-full flex items-center justify-center overflow-hidden">
       {/* 1. Orqa fon rasmi */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -33,6 +42,7 @@ export default function Hero() {
           variant="default"
           size="lg"
           className="bg-[#FFD9A0] cursor-pointer text-black hover:bg-[#c4a67e] rounded-full px-15 py-[30] text-xs font-sora font-bold tracking-[0.25em] uppercase transition-all duration-300 shadow-lg hover:shadow-xl border-none"
+          onClick={scrollToProducts}
         >
           Explore More
         </Button>

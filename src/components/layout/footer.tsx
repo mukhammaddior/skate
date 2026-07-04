@@ -1,10 +1,56 @@
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
 
 export default function Footer() {
+  const [email, setEmail] = useState('');
+
+  const handleNewsletterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) return;
+    alert(`Thank you for subscribing with ${email}!`);
+    setEmail('');
+  };
+
+  const handleScroll = (targetId: string, alertMsg?: string) => {
+    if (alertMsg) {
+      alert(alertMsg);
+      return;
+    }
+
+    if (targetId === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const quickLinks = [
+    { name: 'Home', target: 'home' },
+    { name: 'About Us', target: 'about' },
+    { name: 'Shop', target: 'products' },
+    { name: 'Offers', target: '', alert: 'Special offers are coming soon!' },
+    { name: 'Articles', target: 'blogs' },
+    { name: 'Contact Us', target: 'contact' },
+  ];
+
+  const aboutLinks = [
+    { name: 'History', target: 'about' },
+    { name: 'Videos', target: 'latest-video' },
+    { name: 'Established', target: '', alert: 'Established in 2024. Providing custom boards globally!' },
+    { name: 'Tutorials', target: 'blogs' },
+    { name: 'How To Skate', target: 'blogs' },
+  ];
+
   return (
-    <footer className="w-full bg-white pt-20 pb-10 border-t border-[#E5E5E5]">
+    <footer id="contact" className="w-full bg-white pt-20 pb-10 border-t border-[#E5E5E5]">
       <div className="max-w-[1400px] mx-auto px-6 md:px-16">
         
         {/* 1. Yuqori qism: Grid (4 ta ustun) */}
@@ -12,7 +58,7 @@ export default function Footer() {
           
           {/* Logo va Social qismi */}
           <div className="flex flex-col gap-6">
-            <Link href="/" className="relative w-32 h-10">
+            <Link href="/" className="relative w-32 h-10" onClick={(e) => { e.preventDefault(); handleScroll('home'); }}>
               <Image 
                 src="/images/footer-logo.png" 
                 alt="Skate Logo"
@@ -24,47 +70,55 @@ export default function Footer() {
               Donec sed est felis purus donec porta at. Aenean pharetra purus donec porta lorem cras sagittis tellus sed. Ornare diam ac tristique senectus accumsan habitasse orci.
             </p>
             <div className="flex items-center gap-4">
-              <Link href="#" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+              <Link href="https://facebook.com" target="_blank" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
                 <Icon icon="mdi:facebook" className="w-4 h-4" />
               </Link>
-              <Link href="#" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+              <Link href="https://instagram.com" target="_blank" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
                 <Icon icon="mdi:instagram" className="w-4 h-4" />
               </Link>
-              <Link href="#" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+              <Link href="https://twitter.com" target="_blank" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
                 <Icon icon="mdi:twitter" className="w-4 h-4" />
               </Link>
-              <Link href="#" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
+              <Link href="https://youtube.com" target="_blank" className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center hover:bg-black hover:text-white transition-all">
                 <Icon icon="mdi:youtube" className="w-4 h-4" />
               </Link>
             </div>
           </div>
-
+ 
           {/* Quick Links */}
           <div className="flex flex-col gap-6">
             <h4 className="font-oswald font-black text-xl uppercase tracking-wider">Quick Links</h4>
             <nav className="flex flex-col gap-3">
-              {['Home', 'About Us', 'Shop', 'Offers', 'Articles', 'Contact Us'].map((item) => (
-                <Link key={item} href="#" className="text-sm text-[#666666] hover:text-black transition-colors">
-                  {item}
-                </Link>
+              {quickLinks.map((link) => (
+                <button 
+                  key={link.name} 
+                  onClick={() => handleScroll(link.target, link.alert)}
+                  className="text-left text-sm text-[#666666] hover:text-black transition-colors cursor-pointer"
+                >
+                  {link.name}
+                </button>
               ))}
             </nav>
           </div>
-
+ 
           {/* About */}
           <div className="flex flex-col gap-6">
             <h4 className="font-oswald font-black text-xl uppercase tracking-wider">About</h4>
             <nav className="flex flex-col gap-3">
-              {['History', 'Videos', 'Established', 'Tutorials', 'How To Skate'].map((item) => (
-                <Link key={item} href="#" className="text-sm text-[#666666] hover:text-black transition-colors">
-                  {item}
-                </Link>
+              {aboutLinks.map((link) => (
+                <button 
+                  key={link.name} 
+                  onClick={() => handleScroll(link.target, link.alert)}
+                  className="text-left text-sm text-[#666666] hover:text-black transition-colors cursor-pointer"
+                >
+                  {link.name}
+                </button>
               ))}
             </nav>
           </div>
-
+ 
           {/* Newsletter */}
-          <div className="flex flex-col gap-6">
+          <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-6">
             <h4 className="font-oswald font-black text-xl uppercase tracking-wider">Our Newsletter</h4>
             <p className="text-[#666666] text-sm leading-relaxed">
               Subscribe to our newsletter to get updates about our grand offers.
@@ -72,15 +126,18 @@ export default function Footer() {
             <div className="flex w-full">
               <input 
                 type="email" 
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email-address" 
-                className="flex-grow border border-gray-200 border-r-0 px-4 py-3 text-sm focus:outline-none focus:border-black"
+                className="flex-grow border border-gray-200 border-r-0 px-4 py-3 text-sm focus:outline-none focus:border-black text-black"
               />
-              <button className="bg-[#F4D0A4] cursor-pointer text-black font-oswald font-bold px-6 py-3 text-xs uppercase tracking-widest hover:bg-[#e3be92] transition-colors">
+              <button type="submit" className="bg-[#F4D0A4] cursor-pointer text-black font-oswald font-bold px-6 py-3 text-xs uppercase tracking-widest hover:bg-[#e3be92] transition-colors">
                 Send
               </button>
             </div>
-          </div>
-
+          </form>
+ 
         </div>
 
         {/* 2. Pastki qism: Copyright va To'lovlar */}
